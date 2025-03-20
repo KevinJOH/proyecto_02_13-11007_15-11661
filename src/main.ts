@@ -10,10 +10,12 @@ let currentSceneIndex = 0;
 const scenes = [DynamicFog, Burst, Attraction];
 
 function initScene() {
+
   // Si existe una escena previa, se elimina y se liberan recursos
   if (currentScene) {
     currentScene.dispose();
   }
+
   // Se instancia la siguiente escena
   const SceneClass = scenes[currentSceneIndex];
   currentScene = new SceneClass(container);
