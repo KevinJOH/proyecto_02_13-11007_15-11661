@@ -1,20 +1,9 @@
-// #version 300 es
 precision highp float;
 
 uniform float u_time;
-uniform vec2 u_resolution;
-out vec4 fragColor;
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  fragColor = vec4(uv.x, uv.y, 0.5 + 0.5 * sin(u_time), 1.0);
+  // Calcular color en función del tiempo
+  vec3 color = vec3(sin(u_time), cos(u_time + 1.0), sin(u_time + 2.0));
+  gl_FragColor = vec4(color, 1.0); // Usa gl_FragColor en lugar de fragColor
 }
-// -------------
-// default fragment shader you'll find in TONS of tutorials
-// uniform float time;
-// uniform vec2 resolution;
-
-// void main() {
-//   vec2 uv = gl_FragCoord.xy / resolution.xy;
-//   gl_FragColor = vec4(uv.x, uv.y, 0.5 + 0.5 * sin(time), 1.0);
-// }

@@ -1,19 +1,16 @@
-// #version 300 es
 precision highp float;
 
-in vec3 position;
+in vec3 a_position; // Cambiar el nombre para evitar conflicto
+in vec3 a_offset;
 
-uniform mat4 projectionMatrix;
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
+uniform float u_time;
 
 void main() {
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  // Calcular posición animada
+  vec3 animatedPosition = a_position + a_offset * sin(u_time + a_offset.x);
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(animatedPosition, 1.0);
+  gl_PointSize = 5.0; // Tamaño de la partícula
 }
-// -------------
-// default vertex shader you'll find in TONS of tutorials
-// no need to declare position as it is declared by default
-// modelViewMatrix is the shorthand for (model * view) operation
-// void main() {
-//   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-// }
+
+
+
