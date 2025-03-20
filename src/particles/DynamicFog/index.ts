@@ -14,66 +14,67 @@ export class DynamicFog {
     this.container = container;
     this.scene = new THREE.Scene();
 
+    // Configuramos la cámara para abarcar la escena
     this.camera = new THREE.PerspectiveCamera(
       75,
       container.clientWidth / container.clientHeight,
       0.1,
       1000
     );
-    this.camera.position.z = 10;
+    this.camera.position.z = 4;
 
+    // Renderer con fondo negro y con transparencia activada.
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(this.renderer.domElement);
 
-    // Crear geometría de partículas
+    // Creamos la geometría de partículas.
+    // Usaremos 102400 partículas para obtener buena densidad.
     const geometry = new THREE.BufferGeometry();
-    const numParticles = 102400;
-    const positions = new Float32Array(numParticles * 3);
+    const numParticles = 10240;
     const directions = new Float32Array(numParticles * 3);
 
+    // Distribuimos las partículas en un volumen pequeño centrado (por ejemplo, [-2, 2]).
     for (let i = 0; i < numParticles; i++) {
-      directions[i * 3] = (Math.random() - 0.5) * 10;
-      directions[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      directions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      directions[i * 3]     = (Math.random() - 0.5) * 5;
+      directions[i * 3 + 1] = (Math.random() - 0.5) * 5;
+      directions[i * 3 + 2] = (Math.random() - 0.5) * 5;
     }
-
-    // Atributo "direction" para cada partícula (dirección en el espacio)
+    // Utilizamos el atributo "direction" (ya que Three.js no permite usar "position" para las partículas).
     geometry.setAttribute('direction', new THREE.BufferAttribute(directions, 3));
 
-    // Atributo "position": no se usa directamente en el shader pero es obligatorio
+    // Se requiere también el atributo "position" (dummy) para la compatibilidad de Three.js.
     const dummyPositions = new Float32Array(numParticles * 3);
     geometry.setAttribute('position', new THREE.BufferAttribute(dummyPositions, 3));
 
-    // Material con ShaderMaterial personalizado
+    // Creamos un ShaderMaterial personalizado.
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
       transparent: true,
       depthTest: false,
+      // AdditiveBlending para que las transparencias se acumulen.
       blending: THREE.AdditiveBlending,
       uniforms: {
-        // uTime: tiempo transcurrido
         uTime: { value: 0.0 },
-        // uFillTime: tiempo que tarda en aparecer una partícula
+        // Tiempo de llenado (desde cada esquina hasta el centro)
         uFillTime: { value: 5.0 },
-        // uDisperseTime: tiempo que tarda en desaparecer una partícula
+        // Tiempo de dispersión (desde el centro hacia las esquinas)
         uDisperseTime: { value: 5.0 },
-        // uSizeMin: tamaño mínimo de las partículas
-        uSizeMin: { value: 1.0 },
-        // uSizeMax: tamaño máximo de las partículas
-        uSizeMax: { value: 5.0 },
-        // uDrift: desplazamiento de las partículas
-        uDrift: { value: 0.0 },
-        // uMinX: coordenada mínima en X
-        uMaxX: { value: 0.0 },
-        // uClearColor: color de fondo   
+        // Tamaño en píxeles de las partículas (mínimo y máximo)
+        uSizeMin: { value: 0.1 },
+        uSizeMax: { value: 50.0 },
+        // Drift: desplazamiento suave (ruido) para darle un movimiento orgánico
+        uDrift: { value: 0.5 },
+        // Desplazamiento extremo en X e Y.
+        // A mayor valor, las partículas parten desde más lejos de la pantalla.
+        uMaxX: { value: 8.0 },
+        uMaxY: { value: 8.0 },
+        // Colores: se interpola de un tono claro a uno ligeramente oscuro
         uClearColor: { value: new THREE.Color(0xeeeeee) },
-        // uFillColor: color de las partículas
         uFillColor: { value: new THREE.Color(0x111111) },
-        // uMinOpacity: opacidad mínima de las partículas
-        uMinOpacity: { value: 0.01 },
-        // uMaxOpacity: opacidad máxima de las partículas
+        // Opacidades mínima y máxima para las partículas
+        uMinOpacity: { value: 0.05 },
         uMaxOpacity: { value: 0.1 },
       },
     });
@@ -96,10 +97,7 @@ export class DynamicFog {
   public animate = () => {
     requestAnimationFrame(this.animate);
     const elapsed = (Date.now() - this.startTime) * 0.001;
-
-    // Actualizar el tiempo del shader
-    const material = this.particles.material as THREE.ShaderMaterial;
-    material.uniforms.uTime.value = elapsed;
+    (this.particles.material as THREE.ShaderMaterial).uniforms.uTime.value = elapsed;
     this.renderer.render(this.scene, this.camera);
   };
 
