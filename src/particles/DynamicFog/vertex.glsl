@@ -26,20 +26,19 @@ void main() {
   sideX = (sideX == 0.0) ? 1.0 : sideX;
   sideY = (sideY == 0.0) ? 1.0 : sideY;
   
-  // Fase de "llenado": las partículas parten de fuera (cada esquina) y se acercan al centro.
-  if (tCycle < uFillTime) {
+if (tCycle < uFillTime) {
     float tFill = tCycle / uFillTime;
     factor = smoothstep(0.0, 1.0, tFill);
-    offset.x = mix(sideX * uMaxX, 0.0, tFill);
-    offset.y = mix(sideY * uMaxY, 0.0, tFill);
-  } 
-  // Fase de "dispersión": las partículas salen del centro y regresan hacia las esquinas.
-  else {
+    offset.y = mix(uMaxY, -uMaxY, tFill); // Cambiado para movimiento de arriba a abajo
+    offset.x = 0.0; // Sin desplazamiento horizontal
+}
+// Fase de "dispersión": las partículas parten de abajo y se mueven hacia arriba.
+else {
     float tDisperse = (tCycle - uFillTime) / uDisperseTime;
     factor = 1.0 - smoothstep(0.0, 1.0, tDisperse);
-    offset.x = mix(0.0, sideX * uMaxX, tDisperse);
-    offset.y = mix(0.0, sideY * uMaxY, tDisperse);
-  }
+    offset.y = mix(-uMaxY, uMaxY, tDisperse); // Cambiado para movimiento de abajo a arriba
+    offset.x = 0.0; // Sin desplazamiento horizontal
+}
   
   // Añadimos un leve "drift" usando ruido simple, para que el movimiento sea orgánico.
   vec3 noise = vec3(

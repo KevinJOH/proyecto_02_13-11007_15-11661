@@ -14,6 +14,11 @@ export class DynamicFog {
     this.container = container;
     this.scene = new THREE.Scene();
 
+    // Cargar la textura de fondo
+    const textureLoader = new THREE.TextureLoader();
+    const backgroundTexture = textureLoader.load('../../../public/cementerio.png');
+    this.scene.background = backgroundTexture;
+
     // Configuramos la cámara para abarcar la escena
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -31,13 +36,13 @@ export class DynamicFog {
     // Creamos la geometría de partículas.
     // Usaremos 102400 partículas para obtener buena densidad.
     const geometry = new THREE.BufferGeometry();
-    const numParticles = 10240;
+    const numParticles = 15000;
     const directions = new Float32Array(numParticles * 3);
 
     // Distribuimos las partículas en un volumen pequeño centrado (por ejemplo, [-2, 2]).
     for (let i = 0; i < numParticles; i++) {
       directions[i * 3]     = (Math.random() - 0.5) * 5;
-      directions[i * 3 + 1] = (Math.random() - 0.5) * 5;
+      directions[i * 3 + 1] = (Math.random() - 0.5) * 15;
       directions[i * 3 + 2] = (Math.random() - 0.5) * 5;
     }
     // Utilizamos el atributo "direction" (ya que Three.js no permite usar "position" para las partículas).
@@ -58,21 +63,21 @@ export class DynamicFog {
       uniforms: {
         uTime: { value: 0.0 },
         // Tiempo de llenado (desde cada esquina hasta el centro)
-        uFillTime: { value: 5.0 },
+        uFillTime: { value: 15.0 },
         // Tiempo de dispersión (desde el centro hacia las esquinas)
-        uDisperseTime: { value: 5.0 },
+        uDisperseTime: { value: 15.0 },
         // Tamaño en píxeles de las partículas (mínimo y máximo)
-        uSizeMin: { value: 0.1 },
+        uSizeMin: { value: 40.0 },
         uSizeMax: { value: 50.0 },
         // Drift: desplazamiento suave (ruido) para darle un movimiento orgánico
         uDrift: { value: 0.5 },
         // Desplazamiento extremo en X e Y.
         // A mayor valor, las partículas parten desde más lejos de la pantalla.
-        uMaxX: { value: 8.0 },
-        uMaxY: { value: 8.0 },
+        uMaxX: { value: 10.0 },
+        uMaxY: { value: 10.0 },
         // Colores: se interpola de un tono claro a uno ligeramente oscuro
-        uClearColor: { value: new THREE.Color(0xeeeeee) },
-        uFillColor: { value: new THREE.Color(0x111111) },
+        uClearColor: { value: new THREE.Color(0x9e9e9e) },
+        uFillColor: { value: new THREE.Color(0x9e9e9e) },
         // Opacidades mínima y máxima para las partículas
         uMinOpacity: { value: 0.05 },
         uMaxOpacity: { value: 0.1 },
