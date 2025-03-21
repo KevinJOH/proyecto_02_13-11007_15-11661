@@ -26,7 +26,7 @@ export class DynamicFog {
       0.1,
       1000
     );
-    this.camera.position.z = 4;
+    this.camera.position.z = 3;
 
     // Renderer con fondo negro y con transparencia activada.
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -36,14 +36,14 @@ export class DynamicFog {
     // Creamos la geometría de partículas.
     // Usaremos 102400 partículas para obtener buena densidad.
     const geometry = new THREE.BufferGeometry();
-    const numParticles = 15000;
+    const numParticles = 20000;
     const directions = new Float32Array(numParticles * 3);
 
     // Distribuimos las partículas en un volumen pequeño centrado (por ejemplo, [-2, 2]).
     for (let i = 0; i < numParticles; i++) {
-      directions[i * 3]     = (Math.random() - 0.5) * 5;
-      directions[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      directions[i * 3 + 2] = (Math.random() - 0.5) * 5;
+      directions[i * 3]     = (Math.random() - 0.5) * 15;
+      directions[i * 3 + 1] = (Math.random() - 0.5) * 17;
+      directions[i * 3 + 2] = (Math.random() - 0.5) * 10;
     }
     // Utilizamos el atributo "direction" (ya que Three.js no permite usar "position" para las partículas).
     geometry.setAttribute('direction', new THREE.BufferAttribute(directions, 3));
@@ -63,9 +63,9 @@ export class DynamicFog {
       uniforms: {
         uTime: { value: 0.0 },
         // Tiempo de llenado (desde cada esquina hasta el centro)
-        uFillTime: { value: 15.0 },
+        uFillTime: { value: 17.0 },
         // Tiempo de dispersión (desde el centro hacia las esquinas)
-        uDisperseTime: { value: 15.0 },
+        uDisperseTime: { value: 17.0 },
         // Tamaño en píxeles de las partículas (mínimo y máximo)
         uSizeMin: { value: 40.0 },
         uSizeMax: { value: 50.0 },
